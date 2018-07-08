@@ -20,12 +20,9 @@ import com.demo.utils.Utils;
 public class FaceDetection {
 
 	public static String basePath=System.getProperty("user.dir");
-	public static String classifierPath1=basePath+"\\src\\resources\\haarcascade_frontalface_alt.xml";
-	public static String classifierPath2=basePath+"\\src\\resources\\lbpcascade_frontalface.xml";
-
-	public static String inpImgFilename=basePath+"\\src\\resources\\inp1.png";
-	public static String opImgFilename=basePath+"\\src\\resources\\op1.jpg";
-	public static String opGrayImgFilename=basePath+"\\src\\resources\\gray.jpg";
+	public static String classifierPath1=basePath+"\\src\\resources\\FaceDetection\\haarcascade_frontalface_alt.xml";
+	public static String inpImgFilename=basePath+"\\src\\resources\\FaceDetection\\input.jpg";
+	public static String opImgFilename=basePath+"\\src\\resources\\FaceDetection\\output.jpg";
 
 
 
@@ -33,8 +30,6 @@ public class FaceDetection {
 		try {
 			System.loadLibrary("libopencv_java342");
 			System.out.println("Library loaded..");
-			//BufferedImage bi=ImageIO.read(new File(inpImgFilename));
-			//Mat frame=Utils.bufferedImageToMat(bi);
 			Mat frame=Imgcodecs.imread(inpImgFilename, 1);
 			if (!frame.empty())
 			{
@@ -42,7 +37,7 @@ public class FaceDetection {
 				detectAndDisplay(frame);
 				File outputfile = new File(opImgFilename);
 			    ImageIO.write(Utils.matToBufferedImage(frame), "jpg", outputfile);
-			    System.out.println("Writing image");
+			    System.out.println("Done!!");
 			}
 		} catch (IOException e) {
 			System.out.println("Exception IO");
@@ -62,26 +57,21 @@ public class FaceDetection {
 		// equalize the frame histogram to improve the result
 		Imgproc.equalizeHist(grayFrame, grayFrame);
 		
-		// compute minimum face size (20% of the frame height, in our case)
+		// compute minimum face size (1% of the frame height, in our case)
 		
 			int height = grayFrame.rows();
 			if (Math.round(height * 0.2f) > 0)
 			{
-				absoluteFaceSize = Math.round(height * 0.2f);
+				absoluteFaceSize = Math.round(height * 0.01f);
 			}
-		System.out.println("absoluteFaceSize:"+absoluteFaceSize);
-		File grayOutputfile = new File(opGrayImgFilename);
-
-	    ImageIO.write(Utils.matToBufferedImage(grayFrame), "jpg", grayOutputfile);
-
-		
+				
 		// detect faces
 		faceCascade.detectMultiScale(grayFrame, faces, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
 				new Size(absoluteFaceSize, absoluteFaceSize), new Size(height,height));
 				
 		// each rectangle in faces is a face: draw them!
 		Rect[] facesArray = faces.toArray();
-		System.out.println("facearray len:"+facesArray.length);
+		System.out.println("Number of faces detected = "+facesArray.length);
 		for (int i = 0; i < facesArray.length; i++)
 			Imgproc.rectangle(frame, facesArray[i].tl(), facesArray[i].br(), new Scalar(0, 255, 0), 2);
 			
